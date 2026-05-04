@@ -1,0 +1,678 @@
+// Source code is decompiled from a .class file using FernFlower decompiler (from Intellij IDEA).
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Objects;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+
+public class EmployeeManagementSystem extends JFrame {
+   private final ArrayList<Employee> empList = new ArrayList();
+   private final DefaultTableModel tableModel;
+   private final JTable employeeTable;
+   private final JTextField idField;
+   private final JTextField nameField;
+   private final JComboBox<String> roleCombo;
+   private final JTextField departmentField;
+   private final JTextField emailField;
+   private final JTextField phoneField;
+   private final JTextField joiningField;
+   private final JTextField salaryField;
+   private final JTextField bonusField;
+   private final JTextField taxField;
+   private final JTextField incrementField;
+   private final JTextField searchField;
+   private final JComboBox<String> searchTypeCombo;
+   private final JComboBox<String> sortCombo;
+   private final JLabel statusLabel;
+   private final JLabel summaryLabel;
+   private final JLabel netSalaryLabel;
+   private static final DateTimeFormatter DATE_FORMAT;
+
+   public EmployeeManagementSystem() {
+      super("Employee Management System");
+      this.setModernTheme();
+      this.tableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Role", "Department", "Email", "Phone", "Start Date", "Salary"}, 0) {
+         {
+            Objects.requireNonNull(EmployeeManagementSystem.this);
+         }
+
+         public boolean isCellEditable(int var1, int var2) {
+            return false;
+         }
+      };
+      this.employeeTable = new JTable(this.tableModel);
+      this.employeeTable.setSelectionMode(0);
+      this.employeeTable.setRowHeight(26);
+      this.idField = new JTextField(15);
+      this.nameField = new JTextField(15);
+      this.roleCombo = new JComboBox(new String[]{"Employee", "Manager"});
+      this.departmentField = new JTextField(15);
+      this.emailField = new JTextField(15);
+      this.phoneField = new JTextField(15);
+      this.joiningField = new JTextField(15);
+      this.salaryField = new JTextField(15);
+      this.bonusField = new JTextField("10", 8);
+      this.taxField = new JTextField("12", 8);
+      this.incrementField = new JTextField("5", 8);
+      this.searchField = new JTextField(18);
+      this.searchTypeCombo = new JComboBox(new String[]{"Search by ID", "Search by Name", "Search by Department"});
+      this.sortCombo = new JComboBox(new String[]{"Sort by ID", "Sort by Name", "Sort by Salary", "Sort by Department", "Sort by Role"});
+      this.statusLabel = new JLabel("Ready.");
+      this.summaryLabel = new JLabel("Employees: 0 | Avg Salary: 0.00");
+      this.netSalaryLabel = new JLabel("Net Salary: 0.00");
+      this.initLayout();
+      this.addListeners();
+      this.updateSummary();
+      this.setDefaultCloseOperation(3);
+      this.pack();
+      this.setMinimumSize(new Dimension(980, 640));
+      this.setLocationRelativeTo((Component)null);
+      this.setVisible(true);
+   }
+
+   private void setModernTheme() {
+      try {
+         for(UIManager.LookAndFeelInfo var4 : UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(var4.getName())) {
+               UIManager.setLookAndFeel(var4.getClassName());
+               break;
+            }
+         }
+      } catch (Exception var5) {
+      }
+
+   }
+
+   private JButton createButton(String var1, Color var2) {
+      JButton var3 = new JButton(var1);
+      var3.setBackground(var2);
+      var3.setForeground(Color.WHITE);
+      var3.setFocusPainted(false);
+      var3.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+      return var3;
+   }
+
+   private void initLayout() {
+      JPanel var1 = new JPanel(new GridBagLayout());
+      var1.setPreferredSize(new Dimension(360, 0));
+      var1.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)), BorderFactory.createEmptyBorder(12, 12, 12, 12)));
+      var1.setBackground(new Color(245, 247, 250));
+      GridBagConstraints var2 = new GridBagConstraints();
+      var2.insets = new Insets(8, 8, 8, 8);
+      var2.anchor = 17;
+      var2.fill = 2;
+      var2.weightx = (double)1.0F;
+      var2.gridx = 0;
+      var2.gridy = 0;
+      var1.add(new JLabel("ID:"), var2);
+      var2.gridx = 1;
+      var1.add(this.idField, var2);
+      var2.gridx = 0;
+      var2.gridy = 1;
+      var1.add(new JLabel("Name:"), var2);
+      var2.gridx = 1;
+      var1.add(this.nameField, var2);
+      var2.gridx = 0;
+      var2.gridy = 2;
+      var1.add(new JLabel("Role:"), var2);
+      var2.gridx = 1;
+      var1.add(this.roleCombo, var2);
+      var2.gridx = 0;
+      var2.gridy = 3;
+      var1.add(new JLabel("Department:"), var2);
+      var2.gridx = 1;
+      var1.add(this.departmentField, var2);
+      var2.gridx = 0;
+      var2.gridy = 4;
+      var1.add(new JLabel("Email:"), var2);
+      var2.gridx = 1;
+      var1.add(this.emailField, var2);
+      var2.gridx = 0;
+      var2.gridy = 5;
+      var1.add(new JLabel("Phone:"), var2);
+      var2.gridx = 1;
+      var1.add(this.phoneField, var2);
+      var2.gridx = 0;
+      var2.gridy = 6;
+      var1.add(new JLabel("Joining Date:"), var2);
+      var2.gridx = 1;
+      var1.add(this.joiningField, var2);
+      var2.gridx = 2;
+      var1.add(new JLabel("YYYY-MM-DD"), var2);
+      var2.gridx = 0;
+      var2.gridy = 7;
+      var1.add(new JLabel("Salary:"), var2);
+      var2.gridx = 1;
+      var1.add(this.salaryField, var2);
+      var2.gridx = 0;
+      var2.gridy = 8;
+      var1.add(new JLabel("Bonus %:"), var2);
+      var2.gridx = 1;
+      var1.add(this.bonusField, var2);
+      var2.gridx = 0;
+      var2.gridy = 9;
+      var1.add(new JLabel("Tax %:"), var2);
+      var2.gridx = 1;
+      var1.add(this.taxField, var2);
+      var2.gridx = 0;
+      var2.gridy = 10;
+      var1.add(new JLabel("Increment %:"), var2);
+      var2.gridx = 1;
+      var1.add(this.incrementField, var2);
+      JButton var3 = this.createButton("➕ Add", new Color(36, 123, 160));
+      JButton var4 = this.createButton("✏️ Update", new Color(68, 138, 255));
+      JButton var5 = this.createButton("\ud83d\uddd1️ Delete", new Color(220, 70, 70));
+      JButton var6 = this.createButton("\ud83e\uddf9 Clear All", new Color(120, 130, 150));
+      JButton var7 = this.createButton("\ud83d\udcc4 Export", new Color(80, 100, 180));
+      JButton var8 = this.createButton("\ud83e\uddee Calculate Salary", new Color(16, 124, 49));
+      JButton var9 = this.createButton("⬆️ Increment", new Color(255, 159, 67));
+      JPanel var10 = new JPanel(new GridLayout(0, 3, 10, 10));
+      var10.setOpaque(false);
+      var10.add(var3);
+      var10.add(var4);
+      var10.add(var5);
+      var10.add(var6);
+      var10.add(var8);
+      var10.add(var9);
+      var10.add(var7);
+      var2.gridx = 0;
+      var2.gridy = 11;
+      var2.gridwidth = 3;
+      var2.fill = 2;
+      var1.add(var10, var2);
+      var2.gridwidth = 1;
+      var2.fill = 0;
+      JPanel var11 = new JPanel(new FlowLayout(0, 10, 10));
+      var11.setBorder(BorderFactory.createTitledBorder("Search / Sort"));
+      var11.setBackground(new Color(245, 247, 250));
+      JButton var12 = this.createButton("\ud83d\udd0d Search", new Color(44, 120, 117));
+      JButton var13 = this.createButton("\ud83d\udcda Show All", new Color(96, 125, 139));
+      JButton var14 = this.createButton("\ud83d\udcca Sort", new Color(60, 150, 160));
+      var11.add(this.searchTypeCombo);
+      var11.add(this.searchField);
+      var11.add(var12);
+      var11.add(var13);
+      var11.add(this.sortCombo);
+      var11.add(var14);
+      JPanel var15 = new JPanel(new BorderLayout(10, 10));
+      var15.setPreferredSize(new Dimension(380, 0));
+      var15.setBackground(new Color(245, 247, 250));
+      var15.add(var1, "Center");
+      var15.add(var11, "South");
+      this.employeeTable.setFillsViewportHeight(true);
+      JScrollPane var16 = new JScrollPane(this.employeeTable);
+      var16.setBorder(BorderFactory.createTitledBorder("Employees"));
+      var16.getViewport().setBackground(Color.WHITE);
+      var16.setPreferredSize(new Dimension(620, 0));
+      JPanel var17 = new JPanel(new GridLayout(1, 3, 10, 10));
+      var17.setBackground(new Color(225, 230, 235));
+      this.statusLabel.setOpaque(true);
+      this.statusLabel.setBackground(new Color(225, 230, 235));
+      this.netSalaryLabel.setOpaque(true);
+      this.netSalaryLabel.setBackground(new Color(225, 230, 235));
+      this.summaryLabel.setOpaque(true);
+      this.summaryLabel.setBackground(new Color(225, 230, 235));
+      var17.add(this.summaryLabel);
+      var17.add(this.netSalaryLabel);
+      var17.add(this.statusLabel);
+      JSplitPane var18 = new JSplitPane(1, var15, var16);
+      var18.setDividerLocation(380);
+      var18.setResizeWeight((double)0.0F);
+      var18.setContinuousLayout(true);
+      var18.setOneTouchExpandable(true);
+      Container var19 = this.getContentPane();
+      var19.setLayout(new BorderLayout(10, 10));
+      var19.add(var18, "Center");
+      var19.add(var17, "South");
+      var3.addActionListener((var1x) -> this.addEmployee());
+      var4.addActionListener((var1x) -> this.updateSelectedEmployee());
+      var5.addActionListener((var1x) -> this.deleteSelectedEmployee());
+      var6.addActionListener((var1x) -> this.clearInputs());
+      var12.addActionListener((var1x) -> this.searchEmployees());
+      var13.addActionListener((var1x) -> this.refreshTable());
+      var14.addActionListener((var1x) -> this.sortEmployees());
+      var7.addActionListener((var1x) -> this.exportData());
+      var8.addActionListener((var1x) -> this.calculateSalary());
+      var9.addActionListener((var1x) -> this.applySalaryIncrement());
+   }
+
+   private void addListeners() {
+      this.employeeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+         {
+            Objects.requireNonNull(EmployeeManagementSystem.this);
+         }
+
+         public void valueChanged(ListSelectionEvent var1) {
+            if (!var1.getValueIsAdjusting() && EmployeeManagementSystem.this.employeeTable.getSelectedRow() >= 0) {
+               int var2 = EmployeeManagementSystem.this.employeeTable.getSelectedRow();
+               EmployeeManagementSystem.this.idField.setText(EmployeeManagementSystem.this.tableModel.getValueAt(var2, 0).toString());
+               EmployeeManagementSystem.this.nameField.setText(EmployeeManagementSystem.this.tableModel.getValueAt(var2, 1).toString());
+               EmployeeManagementSystem.this.roleCombo.setSelectedItem(EmployeeManagementSystem.this.tableModel.getValueAt(var2, 2).toString());
+               EmployeeManagementSystem.this.departmentField.setText(EmployeeManagementSystem.this.tableModel.getValueAt(var2, 3).toString());
+               EmployeeManagementSystem.this.emailField.setText(EmployeeManagementSystem.this.tableModel.getValueAt(var2, 4).toString());
+               EmployeeManagementSystem.this.phoneField.setText(EmployeeManagementSystem.this.tableModel.getValueAt(var2, 5).toString());
+               EmployeeManagementSystem.this.joiningField.setText(EmployeeManagementSystem.this.tableModel.getValueAt(var2, 6).toString());
+               EmployeeManagementSystem.this.salaryField.setText(EmployeeManagementSystem.this.tableModel.getValueAt(var2, 7).toString());
+               EmployeeManagementSystem.this.bonusField.setText("10");
+               EmployeeManagementSystem.this.taxField.setText("12");
+            }
+
+         }
+      });
+   }
+
+   private void addEmployee() {
+      String var1 = this.idField.getText().trim();
+      String var2 = this.nameField.getText().trim();
+      String var3 = this.roleCombo.getSelectedItem().toString();
+      String var4 = this.departmentField.getText().trim();
+      String var5 = this.emailField.getText().trim();
+      String var6 = this.phoneField.getText().trim();
+      String var7 = this.joiningField.getText().trim();
+      String var8 = this.salaryField.getText().trim();
+      String var9 = this.bonusField.getText().trim();
+      String var10 = this.taxField.getText().trim();
+      if (!var1.isEmpty() && !var2.isEmpty() && !var4.isEmpty() && !var5.isEmpty() && !var6.isEmpty() && !var7.isEmpty() && !var8.isEmpty()) {
+         int var11;
+         double var12;
+         double var14;
+         double var16;
+         LocalDate var18;
+         try {
+            var11 = Integer.parseInt(var1);
+            var12 = Double.parseDouble(var8);
+            var14 = var9.isEmpty() ? (double)0.0F : Double.parseDouble(var9);
+            var16 = var10.isEmpty() ? (double)0.0F : Double.parseDouble(var10);
+            var18 = LocalDate.parse(var7, DATE_FORMAT);
+         } catch (NumberFormatException var20) {
+            this.setStatus("ID, salary, bonus and tax must be numeric.");
+            return;
+         } catch (DateTimeParseException var21) {
+            this.setStatus("Joining date must be YYYY-MM-DD.");
+            return;
+         }
+
+         if (!(var12 < (double)0.0F) && !(var14 < (double)0.0F) && !(var16 < (double)0.0F)) {
+            if (var5.contains("@") && var5.contains(".")) {
+               if (!var6.matches("\\+?\\d{7,15}")) {
+                  this.setStatus("Phone must contain 7-15 digits.");
+               } else if (this.findEmployeeById(var11) != null) {
+                  this.setStatus("An employee with ID " + var11 + " already exists.");
+               } else {
+                  Employee var19 = new Employee(var11, var2, var3, var4, var5, var6, var18, var12, var14, var16);
+                  this.empList.add(var19);
+                  this.refreshTable();
+                  this.clearInputs();
+                  JOptionPane.showMessageDialog(this, "Employee added successfully!", "Success", 1);
+                  this.setStatus("Employee added successfully.");
+               }
+            } else {
+               this.setStatus("Enter a valid email address.");
+            }
+         } else {
+            this.setStatus("Salary, bonus and tax percentages cannot be negative.");
+         }
+      } else {
+         this.setStatus("Please complete all required fields.");
+      }
+   }
+
+   private void updateSelectedEmployee() {
+      int var1 = this.employeeTable.getSelectedRow();
+      if (var1 < 0) {
+         this.setStatus("Select an employee row to update.");
+      } else {
+         String var2 = this.idField.getText().trim();
+         String var3 = this.nameField.getText().trim();
+         String var4 = this.roleCombo.getSelectedItem().toString();
+         String var5 = this.departmentField.getText().trim();
+         String var6 = this.emailField.getText().trim();
+         String var7 = this.phoneField.getText().trim();
+         String var8 = this.joiningField.getText().trim();
+         String var9 = this.salaryField.getText().trim();
+         String var10 = this.bonusField.getText().trim();
+         String var11 = this.taxField.getText().trim();
+         if (!var2.isEmpty() && !var3.isEmpty() && !var5.isEmpty() && !var6.isEmpty() && !var7.isEmpty() && !var8.isEmpty() && !var9.isEmpty()) {
+            int var12;
+            double var13;
+            double var15;
+            double var17;
+            LocalDate var19;
+            try {
+               var12 = Integer.parseInt(var2);
+               var13 = Double.parseDouble(var9);
+               var15 = var10.isEmpty() ? (double)0.0F : Double.parseDouble(var10);
+               var17 = var11.isEmpty() ? (double)0.0F : Double.parseDouble(var11);
+               var19 = LocalDate.parse(var8, DATE_FORMAT);
+            } catch (NumberFormatException var22) {
+               this.setStatus("ID, salary, bonus and tax must be numeric.");
+               return;
+            } catch (DateTimeParseException var23) {
+               this.setStatus("Joining date must be YYYY-MM-DD.");
+               return;
+            }
+
+            if (!(var13 < (double)0.0F) && !(var15 < (double)0.0F) && !(var17 < (double)0.0F)) {
+               if (var6.contains("@") && var6.contains(".")) {
+                  if (!var7.matches("\\+?\\d{7,15}")) {
+                     this.setStatus("Phone must contain 7-15 digits.");
+                  } else {
+                     int var20 = Integer.parseInt(this.tableModel.getValueAt(var1, 0).toString());
+                     Employee var21 = this.findEmployeeById(var20);
+                     if (var21 == null) {
+                        this.setStatus("Selected employee was not found.");
+                     } else if (var20 != var12 && this.findEmployeeById(var12) != null) {
+                        this.setStatus("Another employee is already using ID " + var12 + ".");
+                     } else {
+                        var21.setId(var12);
+                        var21.setName(var3);
+                        var21.setRole(var4);
+                        var21.setDepartment(var5);
+                        var21.setEmail(var6);
+                        var21.setPhone(var7);
+                        var21.setJoiningDate(var19);
+                        var21.setSalary(var13);
+                        var21.setBonusPercent(var15);
+                        var21.setTaxPercent(var17);
+                        this.refreshTable();
+                        JOptionPane.showMessageDialog(this, "Employee updated successfully!", "Updated", 1);
+                        this.setStatus("Employee updated successfully.");
+                     }
+                  }
+               } else {
+                  this.setStatus("Enter a valid email address.");
+               }
+            } else {
+               this.setStatus("Salary, bonus and tax percentages cannot be negative.");
+            }
+         } else {
+            this.setStatus("Please complete all required fields.");
+         }
+      }
+   }
+
+   private void deleteSelectedEmployee() {
+      int var1 = this.employeeTable.getSelectedRow();
+      if (var1 < 0) {
+         this.setStatus("Select an employee row to delete.");
+      } else {
+         int var2 = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected employee?", "Confirm Delete", 0, 2);
+         if (var2 != 0) {
+            this.setStatus("Delete cancelled.");
+         } else {
+            int var3 = Integer.parseInt(this.tableModel.getValueAt(var1, 0).toString());
+            Employee var4 = this.findEmployeeById(var3);
+            if (var4 != null) {
+               this.empList.remove(var4);
+               this.refreshTable();
+               this.clearInputs();
+               this.setStatus("Employee deleted.");
+            } else {
+               this.setStatus("Employee not found for deletion.");
+            }
+
+         }
+      }
+   }
+
+   private void calculateSalary() {
+      String var1 = this.salaryField.getText().trim();
+      String var2 = this.bonusField.getText().trim();
+      String var3 = this.taxField.getText().trim();
+      if (var1.isEmpty()) {
+         this.setStatus("Enter a salary to calculate.");
+      } else {
+         try {
+            double var4 = Double.parseDouble(var1);
+            double var6 = var2.isEmpty() ? (double)0.0F : Double.parseDouble(var2);
+            double var8 = var3.isEmpty() ? (double)0.0F : Double.parseDouble(var3);
+            if (var4 < (double)0.0F || var6 < (double)0.0F || var8 < (double)0.0F) {
+               this.setStatus("Salary, bonus and tax percentages cannot be negative.");
+               return;
+            }
+
+            double var10 = var4 * var6 / (double)100.0F;
+            double var12 = var4 * var8 / (double)100.0F;
+            double var14 = var4 + var10 - var12;
+            this.netSalaryLabel.setText(String.format("Net Salary: %.2f", var14));
+            JOptionPane.showMessageDialog(this, String.format("Base salary: %.2f\nBonus: %.2f%% (%.2f)\nTax: %.2f%% (%.2f)\nNet salary: %.2f", var4, var6, var10, var8, var12, var14), "Salary Breakdown", 1);
+            this.setStatus("Salary calculated.");
+         } catch (NumberFormatException var16) {
+            this.setStatus("Salary, bonus and tax must be numeric.");
+         }
+
+      }
+   }
+
+   private void applySalaryIncrement() {
+      int var1 = this.employeeTable.getSelectedRow();
+      if (var1 < 0) {
+         this.setStatus("Select an employee to increment salary.");
+      } else {
+         String var2 = this.incrementField.getText().trim();
+         if (var2.isEmpty()) {
+            this.setStatus("Enter an increment percentage.");
+         } else {
+            try {
+               double var3 = Double.parseDouble(var2);
+               if (var3 < (double)0.0F) {
+                  this.setStatus("Increment percentage cannot be negative.");
+                  return;
+               }
+
+               int var5 = Integer.parseInt(this.tableModel.getValueAt(var1, 0).toString());
+               Employee var6 = this.findEmployeeById(var5);
+               if (var6 == null) {
+                  this.setStatus("Selected employee was not found.");
+                  return;
+               }
+
+               double var7 = var6.getSalary() * ((double)1.0F + var3 / (double)100.0F);
+               var6.setSalary(var7);
+               this.salaryField.setText(String.format("%.2f", var7));
+               this.refreshTable();
+               JOptionPane.showMessageDialog(this, String.format("%s's salary increased by %.2f%% to %.2f.", var6.getName(), var3, var7), "Salary Incremented", 1);
+               this.setStatus("Salary increment applied.");
+            } catch (NumberFormatException var9) {
+               this.setStatus("Increment must be numeric.");
+            }
+
+         }
+      }
+   }
+
+   private void searchEmployees() {
+      String var1 = this.searchField.getText().trim();
+      if (var1.isEmpty()) {
+         this.setStatus("Enter text to search.");
+      } else {
+         String var2 = (String)this.searchTypeCombo.getSelectedItem();
+         this.tableModel.setRowCount(0);
+         int var3 = 0;
+
+         for(Employee var5 : this.empList) {
+            boolean var6 = false;
+            if ("Search by ID".equals(var2)) {
+               try {
+                  var6 = var5.getId() == Integer.parseInt(var1);
+               } catch (NumberFormatException var8) {
+               }
+            } else if ("Search by Name".equals(var2)) {
+               var6 = var5.getName().toLowerCase().contains(var1.toLowerCase());
+            } else if ("Search by Department".equals(var2)) {
+               var6 = var5.getDepartment().toLowerCase().contains(var1.toLowerCase());
+            }
+
+            if (var6) {
+               this.addRow(var5);
+               ++var3;
+            }
+         }
+
+         this.setStatus(var3 + " record(s) found.");
+      }
+   }
+
+   private void sortEmployees() {
+      String var1 = (String)this.sortCombo.getSelectedItem();
+      if ("Sort by Name".equals(var1)) {
+         this.empList.sort(Comparator.comparing(Employee::getName, String.CASE_INSENSITIVE_ORDER));
+      } else if ("Sort by Salary".equals(var1)) {
+         this.empList.sort(Comparator.comparingDouble(Employee::getSalary));
+      } else if ("Sort by Department".equals(var1)) {
+         this.empList.sort(Comparator.comparing(Employee::getDepartment, String.CASE_INSENSITIVE_ORDER));
+      } else if ("Sort by Role".equals(var1)) {
+         this.empList.sort(Comparator.comparing(Employee::getRole, String.CASE_INSENSITIVE_ORDER));
+      } else {
+         this.empList.sort(Comparator.comparingInt(Employee::getId));
+      }
+
+      this.refreshTable();
+      this.setStatus(var1 + " applied.");
+   }
+
+   private void exportData() {
+      if (this.empList.isEmpty()) {
+         this.setStatus("No employee data available to export.");
+      } else {
+         try {
+            PrintWriter var1 = new PrintWriter(new FileWriter("employees_report.txt"));
+
+            try {
+               var1.println("Employee Report");
+               var1.println("==============================");
+
+               for(Employee var3 : this.empList) {
+                  var1.printf("ID: %d\n", var3.getId());
+                  var1.printf("Name: %s\n", var3.getName());
+                  var1.printf("Role: %s\n", var3.getRole());
+                  var1.printf("Department: %s\n", var3.getDepartment());
+                  var1.printf("Email: %s\n", var3.getEmail());
+                  var1.printf("Phone: %s\n", var3.getPhone());
+                  var1.printf("Joining Date: %s\n", var3.getJoiningDate().format(DATE_FORMAT));
+                  var1.printf("Salary: %s\n", this.formatSalary(var3.getSalary()));
+                  var1.printf("Bonus: %.2f%%\n", var3.getBonusPercent());
+                  var1.printf("Tax: %.2f%%\n", var3.getTaxPercent());
+                  var1.printf("Net Salary: %s\n", this.formatSalary(var3.calculateNetSalary()));
+                  var1.println("------------------------------");
+               }
+
+               var1.printf("Total employees: %d\n", this.empList.size());
+               var1.printf("Average salary: %s\n", this.formatSalary(this.getAverageSalary()));
+               this.setStatus("Exported data to employees_report.txt.");
+            } catch (Throwable var5) {
+               try {
+                  var1.close();
+               } catch (Throwable var4) {
+                  var5.addSuppressed(var4);
+               }
+
+               throw var5;
+            }
+
+            var1.close();
+         } catch (IOException var6) {
+            this.setStatus("Failed to export data: " + var6.getMessage());
+         }
+
+      }
+   }
+
+   private void refreshTable() {
+      this.tableModel.setRowCount(0);
+
+      for(Employee var2 : this.empList) {
+         this.addRow(var2);
+      }
+
+      this.updateSummary();
+   }
+
+   private void addRow(Employee var1) {
+      this.tableModel.addRow(new Object[]{var1.getId(), var1.getName(), var1.getRole(), var1.getDepartment(), var1.getEmail(), var1.getPhone(), var1.getJoiningDate().format(DATE_FORMAT), this.formatSalary(var1.getSalary())});
+   }
+
+   private void clearInputs() {
+      this.idField.setText("");
+      this.nameField.setText("");
+      this.roleCombo.setSelectedIndex(0);
+      this.departmentField.setText("");
+      this.emailField.setText("");
+      this.phoneField.setText("");
+      this.joiningField.setText("");
+      this.salaryField.setText("");
+      this.bonusField.setText("10");
+      this.taxField.setText("12");
+      this.incrementField.setText("5");
+      this.searchField.setText("");
+      this.employeeTable.clearSelection();
+      this.netSalaryLabel.setText("Net Salary: 0.00");
+      this.setStatus("Inputs cleared.");
+   }
+
+   private Employee findEmployeeById(int var1) {
+      for(Employee var3 : this.empList) {
+         if (var3.getId() == var1) {
+            return var3;
+         }
+      }
+
+      return null;
+   }
+
+   private void updateSummary() {
+      int var1 = this.empList.size();
+      double var2 = this.getAverageSalary();
+      this.summaryLabel.setText(String.format("Employees: %d | Avg Salary: %s", var1, this.formatSalary(var2)));
+   }
+
+   private double getAverageSalary() {
+      return this.empList.isEmpty() ? (double)0.0F : this.empList.stream().mapToDouble(Employee::getSalary).average().orElse((double)0.0F);
+   }
+
+   private String formatSalary(double var1) {
+      return String.format("%.2f", var1);
+   }
+
+   private void setStatus(String var1) {
+      this.statusLabel.setText(var1);
+   }
+
+   public static void main(String[] var0) {
+      SwingUtilities.invokeLater(EmployeeManagementSystem::new);
+   }
+
+   static {
+      DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
+   }
+}

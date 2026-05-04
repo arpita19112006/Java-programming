@@ -1,0 +1,55 @@
+Employee Report
+==============================
+ID: 123
+Name: Arpita
+Role: Employee
+Department: cse
+Email: arpita@gmail.com
+Phone: 1234567890
+Joining Date: 2026-04-10
+Salary: 10000.00
+Bonus: 10.00%
+Tax: 12.00%
+Net Salary: 9800.00
+------------------------------
+ID: 456
+Name: sanika
+Role: Employee
+Department: cse
+Email: sanika@gmail.com
+Phone: 0987654321
+Joining Date: 2005-10-20
+Salary: 250000.00
+Bonus: 10.00%
+Tax: 12.00%
+Net Salary: 245000.00
+------------------------------
+Total employees: 2
+Average salary: 130000.00
+ID: 1
+Name: Sanika
+Role: Manager
+Department: It
+Email: arpita@gmail.com
+Phone: 1234567890
+Joining Date: 2026-01-02
+Salary: 20000.00
+------------------------------
+ID: 1
+Name: arpita
+Role: Developer
+Department: IT
+Email: arpita@gmail.com
+Phone: 1234567890111
+Joining Date: 2026-01-02
+Salary: 200000.00
+------------------------------
+ID: 2
+Name: sanika
+Role: HR
+Department: IT
+Email: sanika@gmial.com
+Phone: 7894561230
+Joining Date: 2020-01-03
+Salary: 300000.00
+------------------------------
